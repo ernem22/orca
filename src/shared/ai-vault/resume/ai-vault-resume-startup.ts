@@ -32,7 +32,7 @@ import {
 } from '../../agent-launch/catalog/tui-agent-config'
 import { findOptionOccurrence } from '../../command-option-occurrence'
 import { assertOpenCodeCopyUsesLocalStore } from '../../opencode-launch-command'
-import { dropOpenCodeV1ServerModeArgs } from './opencode-v1-server-mode-args'
+import { removeAgentArgOption } from '../../agent-session/options/agent-session-option-agent-args'
 import { CLI_CONVERSATION_ADOPTING_AGENTS } from '../../structured-agent-cli-conversation-adoption'
 import type { GlobalSettings } from '../../global-settings-types'
 import { parseWslUncPath } from '../../wsl-paths'
@@ -292,13 +292,12 @@ export function resolveAiVaultCopiedSessionAgentArgs(
   if (mode && !mode.ok) {
     throw new Error('This session cannot be opened in the CLI.')
   }
-  // OpenCode 1 cannot run OpenCode 2's private-server mode flags, so a copied session drops them.
+  const rawModeArgs = mode?.ok ? mode.tokens.slice(1) : []
+  // OpenCode 1 has no --standalone, so a copy from OpenCode 2 must not inherit it.
   const modeArgs =
-    mode?.ok && session.agent === 'opencode'
-      ? dropOpenCodeV1ServerModeArgs(mode.tokens.slice(1))
-      : mode?.ok
-        ? mode.tokens.slice(1)
-        : []
+    session.agent === 'opencode'
+      ? removeAgentArgOption('opencode', rawModeArgs, ['--standalone'], () => true, false)
+      : rawModeArgs
   return [modeArgs.map((token) => quoteStartupArg(token, shell)).join(' '), configuredArgs]
     .filter(Boolean)
     .join(' ')

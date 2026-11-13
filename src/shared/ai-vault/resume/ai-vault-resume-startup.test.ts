@@ -19,8 +19,8 @@ describe('OpenCode 1 copies of OpenCode 2 chats', () => {
         session: { agent: 'opencode', sessionId: 'ses_x', cwd: 'C:\\t' },
         host: { platform: 'win32', codexHome: null, liveShell: 'posix' },
         settings: null,
-        sourceAgent: 'omp'
+        sourceAgent: 'kiro'
       })
-    ).toBe('')
+    ).toBe("'chat' '--tui'")
   })
 })
